@@ -3,46 +3,33 @@ import Button from '../components/Button';
 import { useNavigate } from 'react-router-dom';
 import TravelList from '../components/TravelList';
 import MyDate from '../components/MyDate';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { StateContent } from '../App';
 import Sort from '../components/Sort';
 
 const Domestic = () => {
 
   const travel_data = useContext(StateContent);
- 
+  
   const navigate = useNavigate();
 
-  const [travelList, setTravelList] = useState(travel_data);
+  const [travelList, setTravelList] = useState([]);
+  
+  const current_date = new Date().toISOString().slice(0,7);
+  
+  const [selectedDate,setSelectedDate] = useState(current_date);
+  
+  useEffect(() =>{
+    const date = new Date(selectedDate);
+    const firstDay = 
+      new Date(date.getFullYear(),date.getMonth(),1).getTime();
+    const lastDay =
+      new Date(date.getFullYear(),date.getMonth()+1,0).getTime();
 
-  const [sortBy,setSortBy] = useState('latest');
-
-  const compare = (a, b) => {
-    switch (sortBy) {
-      case "latest" : {
-        return b["startDate"] - a["startDate"];
-      }
-      case "oldest": {
-        return a["startDate"] - b["startDate"];
-      }
-      case "title": {
-        return( 
-          a["title"].toLowerCase() < b["title"].toLowerCase() ? -1 
-        : a["title"].toLowerCase() > b["title"].toLowerCase() ? 1 
-        : 0
-        )
-      }
-      case "rating" : {
-        return b["rating"] - a["rating"]
-      }
-      default: {
-        return b["startDate"] - a["startDate"]
-      }
-    }
-  };
- 
- const sortedList = travelList.sort(compare);
- console.log(sortedList)
+    const list = travel_data.filter(it => 
+      firstDay <= it.startDate && it.startDate <= lastDay);
+    setTravelList(list)
+  }, [selectedDate]);
 
   return(
     <div className="Domestic">
@@ -55,19 +42,24 @@ const Domestic = () => {
           />
         }
       />
-        <MyDate travel_data={travel_data} setTravelList={setTravelList}/>
+        <MyDate
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+        />
       <div className="Sort_Btn_Wrapper">
         <Sort
-          sortBy ={sortBy}
-          setSortBy = {setSortBy}
+          travelList={travelList}
+          setTravelList={setTravelList}
         />
         <Button
-          role = {"작성하기"}
+          role = {"작성하기"}s
           type = {"positive"}
           onClick={() => navigate('/new')}
         />
       </div>
-      <TravelList travelList={travelList} />
+      <TravelList
+        travelList={travelList}       
+      />
     </div>
   )
 }

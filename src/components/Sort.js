@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 const sortList = [
   {
     id : 1,
@@ -21,8 +23,38 @@ const sortList = [
   }
 ]
 
-const Sort = ({setSortBy}) => {
+const Sort = ({travelList,setTravelList}) => {
 
+  const copy_data = travelList.map(arr => arr);
+  const [sortBy,setSortBy] = useState('latest');
+
+  useEffect(() =>{
+    const sortedList = copy_data.sort((a,b) => {
+      switch(sortBy) {
+        case "latest" : {
+          return b.startDate - a.startDate;
+        }
+        case "oldest" : {
+          return a.startDate - b.startDate;
+        }
+        case "title" : {
+          return (
+            b.title > a.title ? -1
+            : a.title > b.title ? 1
+            : 0
+          );
+        }
+        case "rating" : {
+          return b.rating - a.rating;
+        }
+        default :
+          return b.startDate - a.startDate;
+      }
+    }
+    );
+    setTravelList(sortedList);
+  },[sortBy])
+  
   return(
     <select
       onChange={(e) => setSortBy(e.target.value)}

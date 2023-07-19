@@ -127,6 +127,7 @@ header .right_btn_wrapper {
 
 .MyDate input{
   border : none;
+  border-bottom : 1px solid #000;
   font-size : 30px;
   font-family: 'Dongle', sans-serif;
 }
